@@ -7,13 +7,22 @@
   </head>
   <body>
     <div class="container">
-      <div id="logo" class="logo-base"></div>
-      <div class="progress-container">
-        <div id="progress-bar" class="progress-bar"></div>
+      <button id="startBtn" class="game-btn">START GAME</button>
+
+      <div id="gameContainer" class="hidden">
+        <div id="logo" class="logo-base"></div>
+        <div class="progress-container">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="hud">
+          <div>Tiempo: <span id="timer">30</span>s</div>
+          <div>
+            Taps: <span id="tapsCount">0</span>/<span id="tapsTotal">10</span>
+          </div>
+        </div>
       </div>
-      <div class="tap-counter">
-        Taps restantes: <span id="taps-left">10</span>
-      </div>
+
+      <button id="restartBtn" class="game-btn hidden">REPLAY</button>
     </div>
     <script src="app.js"></script>
   </body>

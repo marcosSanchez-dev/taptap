@@ -13,20 +13,12 @@ wss.on("connection", (ws) => {
   ws.on("message", (message) => {
     try {
       const data = JSON.parse(message);
-      console.log(`[SERVER] Recibido: ${data.address} = ${data.value}`);
 
-      // Enviar con manejo de errores en el callback
-      oscClient.send(data.address, data.value, (err) => {
-        if (err) {
-          console.error("[OSC] Error de envío:", err);
-        } else {
-          console.log(
-            `[OSC] Enviado a MadMapper: ${data.address} ${data.value}`
-          );
-        }
-      });
+      // Todos los mensajes OSC pasan por aquí
+      oscClient.send(data.address, data.value);
+      console.log(`[OSC] Enviado: ${data.address} ${data.value}`);
     } catch (error) {
-      console.error("[SERVER] Error procesando mensaje:", error);
+      console.error("[SERVER] Error:", error);
     }
   });
 });
