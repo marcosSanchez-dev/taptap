@@ -62,3 +62,18 @@ body {
 #gameContainer {
   text-align: center;
 }
+
+/* Asegurar que solo el botón Start está visible al inicio */
+#startBtn:not(.hidden) ~ #restartBtn {
+  display: none !important;
+}
+
+.game-btn {
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+
+.game-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
+}

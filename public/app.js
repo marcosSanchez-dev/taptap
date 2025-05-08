@@ -1,6 +1,5 @@
-// const ws = new WebSocket("ws://localhost:8080");
-const serverIP = window.location.hostname; // Obtiene la IP automáticamente
-const ws = new WebSocket("ws://" + window.location.hostname + ":8080");
+const serverIP = window.location.hostname;
+const ws = new WebSocket("ws://" + serverIP + ":8080");
 
 // Variables globales
 let gameActive = false;
@@ -8,7 +7,9 @@ let timeLeft = 30;
 let tapsRequired = 10;
 let currentTaps = 0;
 let timerId = null;
+let lastTap = 0;
 
+// Elementos del DOM
 const startBtn = document.getElementById("startBtn");
 const restartBtn = document.getElementById("restartBtn");
 const gameContainer = document.getElementById("gameContainer");
@@ -16,20 +17,33 @@ const timerDisplay = document.getElementById("timer");
 const tapsCount = document.getElementById("tapsCount");
 const tapsTotal = document.getElementById("tapsTotal");
 
+// Estado inicial
+startBtn.classList.remove("hidden");
+restartBtn.classList.add("hidden");
+gameContainer.classList.add("hidden");
+
 // Event Listeners
 startBtn.addEventListener("click", startGame);
 restartBtn.addEventListener("click", resetGame);
+document.body.addEventListener("pointerdown", handleTap);
 
 function startGame() {
   gameActive = true;
   startBtn.classList.add("hidden");
-  gameContainer.classList.remove("hidden");
   restartBtn.classList.add("hidden");
+  gameContainer.classList.remove("hidden");
 
   // Resetear valores
   timeLeft = 30;
   currentTaps = 0;
-  updateProgress();
+  timerDisplay.textContent = timeLeft;
+  tapsCount.textContent = currentTaps;
+  tapsTotal.textContent = tapsRequired;
+  document.getElementById("progress-bar").style.width = "0%";
+  document.getElementById("logo").style.transform = "scale(1)";
+  document.getElementById("logo").classList.remove("logo-animate");
+
+  ws.send(JSON.stringify({ address: "/start", value: 1 }));
 
   // Iniciar temporizador
   timerId = setInterval(() => {
@@ -40,13 +54,12 @@ function startGame() {
       endGame(false);
     }
   }, 1000);
-
-  tapsTotal.textContent = tapsRequired; // ← Inicializar contador total
-  tapsCount.textContent = 0;
 }
 
-function handleTap() {
-  if (!gameActive || timeLeft <= 0) return;
+function handleTap(e) {
+  const now = Date.now();
+  if (!gameActive || timeLeft <= 0 || now - lastTap < 100) return;
+  lastTap = now;
 
   currentTaps++;
   updateProgress();
@@ -63,7 +76,7 @@ function endGame(won) {
 
   // Enviar estados a MadMapper
   const address = won ? "/win" : "/lose";
-  oscClient.send(address, 1);
+  ws.send(JSON.stringify({ address, value: 1 }));
 
   // Mostrar botón de reinicio
   restartBtn.classList.remove("hidden");
@@ -71,30 +84,28 @@ function endGame(won) {
 }
 
 function resetGame() {
-  // Enviar reset a MadMapper
-  ws.send(JSON.stringify({ address: "/progress", value: 0 }));
+  // Resetear OSC
   ws.send(JSON.stringify({ address: "/win", value: 0 }));
   ws.send(JSON.stringify({ address: "/lose", value: 0 }));
+  ws.send(JSON.stringify({ address: "/progress", value: 0 }));
 
-  // Resetear estado del juego
-  gameActive = false;
-  clearInterval(timerId);
-  timeLeft = 30;
-  currentTaps = 0;
-
-  // Restaurar UI
-  timerDisplay.textContent = timeLeft;
+  // Volver a estado inicial
   startBtn.classList.remove("hidden");
   restartBtn.classList.add("hidden");
-  gameContainer.classList.add("hidden");
-
-  // Resetear progreso visual
-  document.getElementById("progress-bar").style.width = "0%";
-  document.getElementById("logo").classList.remove("logo-animate");
-  document.getElementById("logo").style.transform = "scale(1)";
+  clearInterval(timerId);
 }
 
-// Modificar sendDataToMadMapper
+function updateProgress() {
+  const progress = (currentTaps / tapsRequired) * 100;
+  document.getElementById("progress-bar").style.width = `${progress}%`;
+  tapsCount.textContent = currentTaps;
+
+  // Animación del logo
+  const logo = document.getElementById("logo");
+  logo.style.transform = `scale(${1 + progress / 100})`;
+  if (progress >= 100) logo.classList.add("logo-animate");
+}
+
 function sendDataToMadMapper() {
   const progress = currentTaps / tapsRequired;
   ws.send(
@@ -103,51 +114,13 @@ function sendDataToMadMapper() {
       value: progress,
     })
   );
-
-  // Actualizar HUD
-  document.getElementById("tapsCount").textContent = currentTaps;
 }
 
-function handleTap() {
-  currentTaps = Math.min(currentTaps + 1, tapsRequired);
-  updateProgress();
-  sendDataToMadMapper();
-}
-
-function updateProgress() {
-  const progress = (currentTaps / tapsRequired) * 100;
-
-  // Actualizar elementos del DOM
-  document.getElementById("progress-bar").style.width = `${progress}%`;
-  tapsCount.textContent = currentTaps;
-  tapsTotal.textContent = tapsRequired; // ← Nuevo
-
-  // Animación del logo
-  const logo = document.getElementById("logo");
-  logo.style.transform = `scale(${1 + progress / 100})`;
-  if (progress >= 100) logo.classList.add("logo-animate");
-}
-// Event listeners al final
-// document.body.addEventListener("click", handleTap);
-// document.body.addEventListener("touchend", handleTap);
-
-// Eliminar listeners anteriores y usar Pointer Events
-const pointerHandler = (e) => {
-  e.preventDefault(); // Evita comportamiento táctil por defecto
-  handleTap();
+// Manejo de conexión WebSocket
+ws.onopen = () => {
+  console.log("Conexión WS establecida");
 };
 
-// Usar solo un tipo de evento
-// document.body.addEventListener("pointerup", pointerHandler);
-// Reemplazar líneas 114-124 con:
-let lastTap = 0;
-document.body.addEventListener("pointerdown", (e) => {
-  if (!gameActive) return;
-
-  // Prevenir doble tap
-  const now = Date.now();
-  if (now - lastTap < 100) return;
-  lastTap = now;
-
-  handleTap(e);
-});
+ws.onerror = (error) => {
+  console.error("Error WS:", error);
+};
