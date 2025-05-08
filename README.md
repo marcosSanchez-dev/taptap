@@ -58,7 +58,7 @@ This project is a Progressive Web App (PWA) that allows users to tap a button to
 
 6. **Configure MadMapper**:
 
-   * Set MadMapper to listen for OSC messages on port `3333`.
+   * Set MadMapper to listen for OSC messages on port `8880`.
    * Map the `/progress` OSC address to control your desired visual effect.
 
 ## Notes
