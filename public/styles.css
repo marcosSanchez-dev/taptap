@@ -1,10 +1,12 @@
-/* En styles.css, agregar: */
 body {
-  touch-action: manipulation; /* Desactiva el doble-tap para zoom */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
+button,
 .progress-container {
-  touch-action: none; /* Bloquea gestos en el área interactiva */
+  touch-action: none;
 }
 
 .progress-container {

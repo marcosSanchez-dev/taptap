@@ -65,13 +65,16 @@ function startGame() {
 }
 
 function handleTap(e) {
+  e.preventDefault(); // Bloquear comportamiento por defecto
+
   const now = Date.now();
   if (!gameActive || timeLeft <= 0 || now - lastTap < 100) return;
-  lastTap = now;
 
+  lastTap = now;
   currentTaps = Math.min(currentTaps + 1, tapsRequired);
+
   updateProgress();
-  sendDataToMadMapper(); // Envío de progreso
+  sendDataToMadMapper();
 
   if (currentTaps >= tapsRequired) endGame(true);
 }
