@@ -1,0 +1,28 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependencias
+node_modules/
+
+# Archivos de entorno
+.env
+.env.*.local
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Salidas de compilación
+dist/
+build/
+
+# Archivos de caché
+.cache/
+.nyc_output/
+coverage/
+
+# Archivos de configuración de editores
+.vscode/
+.idea/

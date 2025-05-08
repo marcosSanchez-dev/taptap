@@ -1,0 +1,24 @@
+.progress-container {
+  width: 80%;
+  height: 30px;
+  background: #eee;
+  margin: 20px auto;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: #00ff88;
+  transition: width 0.3s ease;
+}
+
+.logo-base {
+  width: 200px;
+  height: 200px;
+  background: url("icon.png") center/contain;
+  transition: transform 0.5s;
+}
+
+.logo-animate {
+  transform: rotate(360deg) scale(1.2);
+}
