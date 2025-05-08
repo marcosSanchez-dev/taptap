@@ -6,7 +6,8 @@ const app = express();
 const wss = new WebSocket.Server({ port: 8080 });
 
 // Configuración CORRECTA del cliente OSC
-const oscClient = new OSC.Client("127.0.0.1", 8880);
+// const oscClient = new OSC.Client("127.0.0.1", 8880);
+const oscClient = new OSC.Client("192.168.68.101", 8880);
 
 wss.on("connection", (ws) => {
   ws.on("message", (message) => {
@@ -31,4 +32,4 @@ wss.on("connection", (ws) => {
 });
 
 app.use(express.static("public"));
-app.listen(3000, () => console.log("Servidor en puerto 3000"));
+app.listen(3000, "0.0.0.0", () => console.log("Servidor en puerto 3000"));

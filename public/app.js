@@ -1,4 +1,6 @@
-const ws = new WebSocket("ws://localhost:8080");
+// const ws = new WebSocket("ws://localhost:8080");
+const serverIP = window.location.hostname; // Obtiene la IP automáticamente
+const ws = new WebSocket(`ws://${serverIP}:8080`);
 let tapsRequired = 10;
 let currentTaps = 0;
 
