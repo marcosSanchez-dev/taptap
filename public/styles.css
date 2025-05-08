@@ -77,3 +77,26 @@ body {
   pointer-events: none;
   transform: scale(0.9);
 }
+
+#resultMessage {
+  font-size: 3rem;
+  text-align: center;
+  margin: 20px 0;
+  font-weight: bold;
+  display: none;
+}
+
+.win-message {
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.lose-message {
+  color: #ff4444;
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+/* Asegurar visibilidad del mensaje */
+#restartBtn:not(.hidden) + #resultMessage {
+  display: block;
+}
