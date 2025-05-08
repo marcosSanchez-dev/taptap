@@ -34,5 +34,14 @@ function updateProgress() {
 }
 
 // Event listeners al final
-document.body.addEventListener("click", handleTap);
-document.body.addEventListener("touchend", handleTap);
+// document.body.addEventListener("click", handleTap);
+// document.body.addEventListener("touchend", handleTap);
+
+// Eliminar listeners anteriores y usar Pointer Events
+const pointerHandler = (e) => {
+  e.preventDefault(); // Evita comportamiento táctil por defecto
+  handleTap();
+};
+
+// Usar solo un tipo de evento
+document.body.addEventListener("pointerup", pointerHandler);
