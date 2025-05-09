@@ -3,7 +3,7 @@ const ws = new WebSocket("ws://" + serverIP + ":8080");
 
 // Variables globales
 let gameActive = false;
-let timeLeft = 30;
+let timeLeft = 10;
 let tapsRequired = 30;
 let currentTaps = 0;
 let timerId = null;
@@ -52,7 +52,7 @@ function startGame() {
   ws.send(JSON.stringify({ address: "/start", value: 1 }));
 
   // Resetear valores
-  timeLeft = 30;
+  timeLeft = 10;
   currentTaps = 0;
   updateUI();
 
