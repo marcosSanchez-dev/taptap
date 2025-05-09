@@ -4,7 +4,7 @@ const ws = new WebSocket("ws://" + serverIP + ":8080");
 // Variables globales
 let gameActive = false;
 let timeLeft = 30;
-let tapsRequired = 10;
+let tapsRequired = 30;
 let currentTaps = 0;
 let timerId = null;
 let lastTap = 0;

@@ -1,44 +1,65 @@
 body {
   touch-action: manipulation;
   -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   user-select: none;
+  background: #0a0a1a;
+  overflow: hidden;
+  font-family: "Roboto", sans-serif;
 }
 
-button,
-.progress-container {
-  touch-action: none;
+/* Contenedores principales */
+.gradient-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+  z-index: -1;
+  opacity: 0.9;
 }
 
+#gameContainer {
+  text-align: center;
+}
+
+.particle-container {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+/* Elementos de juego */
 .progress-container {
   width: 80%;
   height: 30px;
   background: #eee;
   margin: 20px auto;
+  border-radius: 15px;
+  overflow: hidden;
 }
 
 .progress-bar {
   width: 0%;
   height: 100%;
-  background: #00ff88;
+  background: linear-gradient(90deg, #00ff88 0%, #00ffaa 100%);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
   transition: width 0.3s ease;
 }
 
 .logo-base {
-  width: 200px;
-  height: 200px;
+  width: 250px;
+  height: 250px;
   background: url("icon.png") center/contain;
   transition: transform 0.5s;
+  filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.5));
+  animation: float 3s ease-in-out infinite;
 }
 
-.logo-animate {
-  transform: rotate(360deg) scale(1.2);
-}
-
-/* Game UI */
-.hidden {
-  display: none;
-}
-
+/* Botones y controles */
 .game-btn {
   padding: 15px 30px;
   font-size: 1.5em;
@@ -48,8 +69,25 @@ button,
   cursor: pointer;
   margin: 20px auto;
   display: block;
+  transition: opacity 0.3s ease, transform 0.2s ease;
 }
 
+.game-btn.neon-pulse {
+  background: rgba(0, 255, 136, 0.1);
+  border: 2px solid #00ff88;
+  box-shadow: 0 0 15px #00ff88, inset 0 0 10px #00ff88;
+  color: #00ff88;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-btn.neon-pulse:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px #00ff88;
+}
+
+/* HUD y mensajes */
 .hud {
   display: flex;
   justify-content: space-between;
@@ -61,31 +99,11 @@ button,
   text-shadow: 1px 1px 2px #000;
 }
 
-#gameContainer {
-  text-align: center;
-}
-
-/* Asegurar que solo el botón Start está visible al inicio */
-#startBtn:not(.hidden) ~ #restartBtn {
-  display: none !important;
-}
-
-.game-btn {
-  transition: opacity 0.3s ease, transform 0.2s ease;
-}
-
-.game-btn.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.9);
-}
-
 #resultMessage {
   font-size: 3rem;
   text-align: center;
   margin: 20px 0;
   font-weight: bold;
-  display: none;
 }
 
 .win-message {
@@ -98,61 +116,7 @@ button,
   text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
 }
 
-/* Asegurar visibilidad del mensaje */
-#restartBtn:not(.hidden) + #resultMessage {
-  display: block;
-}
-
-/* Mejoras en el CSS */
-body {
-  background: #0a0a1a;
-  overflow: hidden;
-  font-family: "Roboto", sans-serif;
-}
-
-.gradient-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
-  z-index: -1;
-  opacity: 0.9;
-}
-
-.logo-base {
-  width: 250px;
-  height: 250px;
-  filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.5));
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-.neon-pulse {
-  background: rgba(0, 255, 136, 0.1);
-  border: 2px solid #00ff88;
-  box-shadow: 0 0 15px #00ff88, inset 0 0 10px #00ff88;
-  color: #00ff88;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  transition: all 0.3s ease;
-}
-
-.neon-pulse:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 25px #00ff88;
-}
-
+/* Efectos visuales */
 .hologram-effect {
   background: linear-gradient(
     45deg,
@@ -164,27 +128,19 @@ body {
   animation: hologram 2s linear infinite;
 }
 
-@keyframes hologram {
-  0% {
-    background-position: 100% 100%;
-  }
-  100% {
-    background-position: 0% 0%;
-  }
-}
-
-.particle-container {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-}
-
 .particle {
   position: absolute;
   background: radial-gradient(circle, #00ff88 20%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
+}
+
+/* Utilidades */
+.hidden {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
 }
 
 .futurist-ui {
@@ -195,11 +151,28 @@ body {
   box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
-.result-container {
-  font-size: 4rem;
-  animation: text-glow 1.5s ease-in-out infinite alternate;
-  position: relative;
-  z-index: 100;
+.glow {
+  filter: drop-shadow(0 0 10px #00ff88);
+}
+
+/* Animaciones */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes hologram {
+  0% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
 }
 
 @keyframes text-glow {
@@ -211,11 +184,22 @@ body {
   }
 }
 
-.progress-bar {
-  background: linear-gradient(90deg, #00ff88 0%, #00ffaa 100%);
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+.logo-animate {
+  transform: rotate(360deg) scale(1.2);
 }
 
-.glow {
-  filter: drop-shadow(0 0 10px #00ff88);
+.result-container {
+  font-size: 4rem;
+  animation: text-glow 1.5s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 100;
+}
+
+/* Reglas específicas */
+#startBtn:not(.hidden) ~ #restartBtn {
+  display: none;
+}
+
+#restartBtn:not(.hidden) + #resultMessage {
+  display: block;
 }
