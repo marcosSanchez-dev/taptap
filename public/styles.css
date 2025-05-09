@@ -1,44 +1,65 @@
 body {
   touch-action: manipulation;
   -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   user-select: none;
+  background: #0a0a1a;
+  overflow: hidden;
+  font-family: "Roboto", sans-serif;
 }
 
-button,
-.progress-container {
-  touch-action: none;
+/* Contenedores principales */
+.gradient-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+  z-index: -1;
+  opacity: 0.9;
 }
 
+#gameContainer {
+  text-align: center;
+}
+
+.particle-container {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+/* Elementos de juego */
 .progress-container {
   width: 80%;
   height: 30px;
   background: #eee;
   margin: 20px auto;
+  border-radius: 15px;
+  overflow: hidden;
 }
 
 .progress-bar {
   width: 0%;
   height: 100%;
-  background: #00ff88;
+  background: linear-gradient(90deg, #00ff88 0%, #00ffaa 100%);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
   transition: width 0.3s ease;
 }
 
 .logo-base {
-  width: 200px;
-  height: 200px;
+  width: 250px;
+  height: 250px;
   background: url("icon.png") center/contain;
   transition: transform 0.5s;
+  filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.5));
+  animation: float 3s ease-in-out infinite;
 }
 
-.logo-animate {
-  transform: rotate(360deg) scale(1.2);
-}
-
-/* Game UI */
-.hidden {
-  display: none;
-}
-
+/* Botones y controles */
 .game-btn {
   padding: 15px 30px;
   font-size: 1.5em;
@@ -48,8 +69,25 @@ button,
   cursor: pointer;
   margin: 20px auto;
   display: block;
+  transition: opacity 0.3s ease, transform 0.2s ease;
 }
 
+.game-btn.neon-pulse {
+  background: rgba(0, 255, 136, 0.1);
+  border: 2px solid #00ff88;
+  box-shadow: 0 0 15px #00ff88, inset 0 0 10px #00ff88;
+  color: #00ff88;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-btn.neon-pulse:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px #00ff88;
+}
+
+/* HUD y mensajes */
 .hud {
   display: flex;
   justify-content: space-between;
@@ -61,31 +99,11 @@ button,
   text-shadow: 1px 1px 2px #000;
 }
 
-#gameContainer {
-  text-align: center;
-}
-
-/* Asegurar que solo el botón Start está visible al inicio */
-#startBtn:not(.hidden) ~ #restartBtn {
-  display: none !important;
-}
-
-.game-btn {
-  transition: opacity 0.3s ease, transform 0.2s ease;
-}
-
-.game-btn.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.9);
-}
-
 #resultMessage {
   font-size: 3rem;
   text-align: center;
   margin: 20px 0;
   font-weight: bold;
-  display: none;
 }
 
 .win-message {
@@ -98,7 +116,211 @@ button,
   text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
 }
 
-/* Asegurar visibilidad del mensaje */
+/* Efectos visuales */
+.hologram-effect {
+  background: linear-gradient(
+    45deg,
+    transparent 49%,
+    rgba(0, 255, 136, 0.2) 50%,
+    transparent 51%
+  );
+  background-size: 200% 200%;
+  animation: hologram 2s linear infinite;
+}
+
+.particle {
+  position: absolute;
+  background: radial-gradient(circle, #00ff88 20%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Utilidades */
+.hidden {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
+}
+
+.futurist-ui {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px 25px;
+  border-radius: 10px;
+  border: 1px solid #00ff88;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.glow {
+  filter: drop-shadow(0 0 10px #00ff88);
+}
+
+/* Animaciones */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes hologram {
+  0% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+@keyframes text-glow {
+  from {
+    text-shadow: 0 0 10px #00ff88;
+  }
+  to {
+    text-shadow: 0 0 30px #00ff88, 0 0 10px #fff;
+  }
+}
+
+.logo-animate {
+  transform: rotate(360deg) scale(1.2);
+}
+
+.result-container {
+  font-size: 4rem;
+  animation: text-glow 1.5s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 100;
+}
+
+/* Reglas específicas */
+#startBtn:not(.hidden) ~ #restartBtn {
+  display: none;
+}
+
 #restartBtn:not(.hidden) + #resultMessage {
   display: block;
+}
+
+/* Añade estas reglas al final de tu CSS */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  width: 100%;
+  max-width: 800px;
+  min-height: 100vh;
+  position: relative;
+}
+
+#gameContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  padding: 20px;
+}
+
+/* Ajustes específicos para elementos */
+.logo-base {
+  margin: 20px 0;
+}
+
+.progress-container {
+  margin: 0;
+  width: 100%;
+  max-width: 500px;
+}
+
+.hud {
+  width: 100%;
+  max-width: 500px;
+  padding: 15px;
+  margin: 0;
+}
+
+#resultMessage {
+  margin: 30px 0;
+  line-height: 1.2;
+}
+
+.game-btn {
+  margin: 0;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 480px) {
+  .container {
+    gap: 20px;
+  }
+
+  #gameContainer {
+    gap: 25px;
+  }
+
+  .logo-base {
+    width: 200px;
+    height: 200px;
+  }
+
+  .game-btn {
+    font-size: 1.2em;
+    padding: 12px 25px;
+  }
+
+  #resultMessage {
+    font-size: 2.5rem;
+  }
+}
+
+.particle-container {
+  position: fixed;
+  /* mantener el resto de propiedades */
+}
+
+.gradient-background {
+  position: fixed;
+  /* mantener el resto de propiedades */
+}
+
+span.btn-text {
+  color: #00ff88 !important;
+}
+
+/* Añade este keyframe */
+@keyframes tap-pulse {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(0.95);
+  }
+  40% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.logo-base {
+  /* Añade esta propiedad */
+  animation: tap-pulse 0.3s ease-out forwards;
+  animation-play-state: paused;
 }

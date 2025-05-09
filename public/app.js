@@ -3,8 +3,8 @@ const ws = new WebSocket("ws://" + serverIP + ":8080");
 
 // Variables globales
 let gameActive = false;
-let timeLeft = 30;
-let tapsRequired = 10;
+let timeLeft = 10;
+let tapsRequired = 30;
 let currentTaps = 0;
 let timerId = null;
 let lastTap = 0;
@@ -52,7 +52,7 @@ function startGame() {
   ws.send(JSON.stringify({ address: "/start", value: 1 }));
 
   // Resetear valores
-  timeLeft = 30;
+  timeLeft = 10;
   currentTaps = 0;
   updateUI();
 
@@ -62,6 +62,59 @@ function startGame() {
     timerDisplay.textContent = timeLeft;
     if (timeLeft <= 0) endGame(false);
   }, 1000);
+}
+
+function createParticles(x, y) {
+  for (let i = 0; i < 10; i++) {
+    const particle = document.createElement("div");
+    particle.className = "particle";
+
+    particle.style.left = `${x}px`;
+    particle.style.top = `${y}px`;
+    particle.style.width = `${Math.random() * 10 + 5}px`;
+    particle.style.height = particle.style.width;
+
+    document.querySelector(".particle-container").appendChild(particle);
+
+    // Animación
+    const angle = Math.random() * 360 * (Math.PI / 180);
+    const velocity = Math.random() * 5 + 2;
+
+    anime({
+      targets: particle,
+      opacity: 0,
+      translateX: Math.cos(angle) * 100,
+      translateY: Math.sin(angle) * 100,
+      duration: 1000,
+      easing: "easeOutExpo",
+      complete: () => particle.remove(),
+    });
+  }
+}
+
+function vibrate(duration) {
+  if ("vibrate" in navigator) navigator.vibrate(duration);
+}
+
+function animateLogo() {
+  const logo = document.getElementById("logo");
+
+  // Resetear la animación para permitir retrigger rápido
+  logo.style.animation = "none";
+  void logo.offsetWidth; // Trigger reflow
+  logo.style.animation = "tap-pulse 0.3s ease-out";
+
+  // Animación suave de brillo
+  anime({
+    targets: logo,
+    filter: [
+      "drop-shadow(0 0 15px rgba(0, 255, 136, 0.5))",
+      "drop-shadow(0 0 25px rgba(0, 255, 136, 0.8))",
+    ],
+    duration: 150,
+    easing: "easeOutQuad",
+    direction: "alternate",
+  });
 }
 
 function handleTap(e) {
@@ -77,6 +130,10 @@ function handleTap(e) {
   sendDataToMadMapper();
 
   if (currentTaps >= tapsRequired) endGame(true);
+
+  createParticles(e.clientX, e.clientY);
+  animateLogo();
+  vibrate(50);
 }
 
 function endGame(won) {
