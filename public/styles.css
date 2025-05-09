@@ -302,3 +302,25 @@ body {
 span.btn-text {
   color: #00ff88 !important;
 }
+
+/* Añade este keyframe */
+@keyframes tap-pulse {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(0.95);
+  }
+  40% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.logo-base {
+  /* Añade esta propiedad */
+  animation: tap-pulse 0.3s ease-out forwards;
+  animation-play-state: paused;
+}

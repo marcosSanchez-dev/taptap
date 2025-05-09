@@ -97,11 +97,23 @@ function vibrate(duration) {
 }
 
 function animateLogo() {
+  const logo = document.getElementById("logo");
+
+  // Resetear la animación para permitir retrigger rápido
+  logo.style.animation = "none";
+  void logo.offsetWidth; // Trigger reflow
+  logo.style.animation = "tap-pulse 0.3s ease-out";
+
+  // Animación suave de brillo
   anime({
-    targets: "#logo",
-    scale: [1, 1.2],
-    duration: 300,
-    easing: "spring(1, 80, 10, 0)",
+    targets: logo,
+    filter: [
+      "drop-shadow(0 0 15px rgba(0, 255, 136, 0.5))",
+      "drop-shadow(0 0 25px rgba(0, 255, 136, 0.8))",
+    ],
+    duration: 150,
+    easing: "easeOutQuad",
+    direction: "alternate",
   });
 }
 
