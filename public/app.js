@@ -64,6 +64,47 @@ function startGame() {
   }, 1000);
 }
 
+function createParticles(x, y) {
+  for (let i = 0; i < 10; i++) {
+    const particle = document.createElement("div");
+    particle.className = "particle";
+
+    particle.style.left = `${x}px`;
+    particle.style.top = `${y}px`;
+    particle.style.width = `${Math.random() * 10 + 5}px`;
+    particle.style.height = particle.style.width;
+
+    document.querySelector(".particle-container").appendChild(particle);
+
+    // Animación
+    const angle = Math.random() * 360 * (Math.PI / 180);
+    const velocity = Math.random() * 5 + 2;
+
+    anime({
+      targets: particle,
+      opacity: 0,
+      translateX: Math.cos(angle) * 100,
+      translateY: Math.sin(angle) * 100,
+      duration: 1000,
+      easing: "easeOutExpo",
+      complete: () => particle.remove(),
+    });
+  }
+}
+
+function vibrate(duration) {
+  if ("vibrate" in navigator) navigator.vibrate(duration);
+}
+
+function animateLogo() {
+  anime({
+    targets: "#logo",
+    scale: [1, 1.2],
+    duration: 300,
+    easing: "spring(1, 80, 10, 0)",
+  });
+}
+
 function handleTap(e) {
   e.preventDefault(); // Bloquear comportamiento por defecto
 
@@ -77,6 +118,10 @@ function handleTap(e) {
   sendDataToMadMapper();
 
   if (currentTaps >= tapsRequired) endGame(true);
+
+  createParticles(e.clientX, e.clientY);
+  animateLogo();
+  vibrate(50);
 }
 
 function endGame(won) {

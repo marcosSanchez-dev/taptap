@@ -18,23 +18,40 @@
     </style>
   </head>
   <body>
+    <!-- Modificaciones en el HTML -->
     <div class="container">
-      <button id="startBtn" class="game-btn">START GAME</button>
+      <div class="particle-container"></div>
+      <div class="gradient-background"></div>
+
+      <button id="startBtn" class="game-btn neon-pulse">
+        <span class="btn-text">🎮 START EXPERIENCE</span>
+      </button>
 
       <div id="gameContainer" class="hidden">
-        <div id="logo" class="logo-base"></div>
-        <div class="progress-container">
+        <div id="logo" class="logo-base floating"></div>
+        <div class="particle-emitter"></div>
+
+        <div class="progress-container glow">
           <div id="progress-bar" class="progress-bar"></div>
         </div>
-        <div class="hud">
-          <div>Tiempo: <span id="timer">30</span>s</div>
-          <div>
-            Taps: <span id="tapsCount">0</span>/<span id="tapsTotal">10</span>
+
+        <div class="hud futurist-ui">
+          <div class="hud-item">
+            ⏳ <span id="timer">30</span>s
+            <div class="hud-line"></div>
+          </div>
+          <div class="hud-item">
+            💖 <span id="tapsCount">0</span>/<span id="tapsTotal">10</span>
+            <div class="hud-line"></div>
           </div>
         </div>
       </div>
-      <div id="resultMessage"></div>
-      <button id="restartBtn" class="game-btn hidden">REPLAY</button>
+
+      <div id="resultMessage" class="result-container"></div>
+
+      <button id="restartBtn" class="game-btn hidden hologram-effect">
+        <span class="btn-text">🔄 TRY AGAIN</span>
+      </button>
     </div>
     <script src="app.js"></script>
   </body>
