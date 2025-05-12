@@ -1,13 +1,13 @@
-// const serverIP = window.location.hostname;
-// const ws = new WebSocket("ws://" + serverIP + ":8080");
+const serverIP = window.location.hostname;
+const ws = new WebSocket("ws://" + serverIP + ":8080");
 
 // Por esta versión adaptativa
-const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-const wsHost =
-  window.location.hostname === "localhost"
-    ? "localhost:8080"
-    : window.location.host;
-const ws = new WebSocket(`${wsProtocol}${wsHost}`);
+// const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+// const wsHost =
+//   window.location.hostname === "localhost"
+//     ? "localhost:8080"
+//     : window.location.host;
+// const ws = new WebSocket(`${wsProtocol}${wsHost}`);
 
 // Variables globales
 let gameActive = false;
