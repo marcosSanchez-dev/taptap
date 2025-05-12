@@ -268,14 +268,17 @@ function updateProgress(player) {
   const progress = (players[player].taps / tapsRequired) * 100;
   const progressBar = document.getElementById(players[player].progressBar);
   const logo = document.getElementById(players[player].logo);
+  // Agregar esta línea para actualizar el contador numérico
+  const countElement = document.getElementById(players[player].countElement);
 
-  if (!progressBar || !logo) {
+  if (!progressBar || !logo || !countElement) {
     console.error(`Elementos no encontrados para el jugador ${player}`);
     return;
   }
 
   progressBar.style.width = `${progress}%`;
   logo.style.transform = `scale(${1 + progress / 100})`;
+  countElement.textContent = players[player].taps; // <- Esta es la línea clave
 
   if (progress >= 100) {
     logo.classList.add("logo-animate");
