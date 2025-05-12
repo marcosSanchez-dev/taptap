@@ -12,7 +12,7 @@ const ws = new WebSocket("ws://" + serverIP + ":8080");
 // Variables globales
 let gameActive = false;
 let timeLeft = 10;
-let tapsRequired = 30;
+let tapsRequired = 40;
 let currentTaps = 0;
 let timerId = null;
 let lastTap = 0;
@@ -73,7 +73,7 @@ function updateUI() {
 function startGame() {
   gameActive = true;
   timeLeft = 10; // Resetear tiempo
-  tapsRequired = 30; // Fijar valor requerido
+  tapsRequired = 40; // Fijar valor requerido
 
   if (timerId) clearInterval(timerId);
 
@@ -108,11 +108,21 @@ function startGame() {
   }, 1000);
 }
 
-function createParticles(x, y) {
+function createParticles(x, y, player) {
+  const colorConfig =
+    player === 1
+      ? { primary: "#00ff88", shadow: "0, 255, 136" }
+      : { primary: "#ff0096", shadow: "255, 0, 150" };
+
   for (let i = 0; i < 10; i++) {
     const particle = document.createElement("div");
     particle.className = "particle";
 
+    // Estilo con color del jugador
+    particle.style.backgroundColor = colorConfig.primary;
+    particle.style.boxShadow = `0 0 15px rgba(${colorConfig.shadow}, 0.5)`;
+
+    // Posicionamiento
     particle.style.left = `${x}px`;
     particle.style.top = `${y}px`;
     particle.style.width = `${Math.random() * 10 + 5}px`;
@@ -120,15 +130,16 @@ function createParticles(x, y) {
 
     document.querySelector(".particle-container").appendChild(particle);
 
-    // Animación
+    // Animación con parámetros ajustados
     const angle = Math.random() * 360 * (Math.PI / 180);
-    const velocity = Math.random() * 5 + 2;
+    const velocity = Math.random() * 150 + 50; // Más dramática
 
     anime({
       targets: particle,
-      opacity: 0,
-      translateX: Math.cos(angle) * 100,
-      translateY: Math.sin(angle) * 100,
+      opacity: [1, 0],
+      translateX: Math.cos(angle) * velocity,
+      translateY: Math.sin(angle) * velocity,
+      scale: [1, 0.2],
       duration: 1000,
       easing: "easeOutExpo",
       complete: () => particle.remove(),
@@ -198,7 +209,7 @@ function handleTap(e) {
     }
   }
 
-  createParticles(e.clientX, e.clientY, player);
+  createParticles(e.pageX, e.pageY, player);
   animateLogo(player);
   vibrate(50);
 }
