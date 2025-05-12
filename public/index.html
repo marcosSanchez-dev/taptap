@@ -19,7 +19,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
   </head>
   <body>
-    <!-- Modificaciones en el HTML -->
     <div class="particle-container"></div>
     <div class="container">
       <div class="gradient-background"></div>
@@ -29,21 +28,39 @@
       </button>
 
       <div id="gameContainer" class="hidden">
-        <div id="logo" class="logo-base floating"></div>
-        <div class="particle-emitter"></div>
-
-        <div class="progress-container glow">
-          <div id="progress-bar" class="progress-bar"></div>
+        <!-- Jugador 1 -->
+        <div class="player-section player-1">
+          <div id="logo1" class="logo-base floating"></div>
+          <div class="hud futurist-ui">
+            <div class="hud-item">
+              ⏳ <span id="timer1">10</span>s
+              <div class="hud-line"></div>
+            </div>
+            <div class="hud-item">
+              💖 <span id="tapsCount1">0</span>/<span id="tapsTotal">30</span>
+              <div class="hud-line"></div>
+            </div>
+          </div>
+          <div class="progress-container glow">
+            <div id="progress-bar1" class="progress-bar"></div>
+          </div>
         </div>
 
-        <div class="hud futurist-ui">
-          <div class="hud-item">
-            ⏳ <span id="timer">30</span>s
-            <div class="hud-line"></div>
+        <!-- Jugador 2 -->
+        <div class="player-section player-2">
+          <div id="logo2" class="logo-base floating"></div>
+          <div class="hud futurist-ui">
+            <div class="hud-item">
+              ⏳ <span id="timer2">10</span>s
+              <div class="hud-line"></div>
+            </div>
+            <div class="hud-item">
+              💖 <span id="tapsCount2">0</span>/<span id="tapsTotal">30</span>
+              <div class="hud-line"></div>
+            </div>
           </div>
-          <div class="hud-item">
-            💖 <span id="tapsCount">0</span>/<span id="tapsTotal">10</span>
-            <div class="hud-line"></div>
+          <div class="progress-container glow">
+            <div id="progress-bar2" class="progress-bar"></div>
           </div>
         </div>
       </div>
