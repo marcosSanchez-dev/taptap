@@ -1,19 +1,23 @@
 /* Reset y estilos base */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 body {
   touch-action: manipulation;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
   user-select: none;
   background: #0a0a1a;
-  overflow: hidden;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
   font-family: "Roboto", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  margin: 0;
-  padding: 20px;
 }
 
 /* Contenedores */
@@ -23,46 +27,43 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100vw;
 }
 
 .container {
-  justify-content: center;
-  gap: 30px;
-  max-width: 800px;
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
   position: relative;
 }
 
 #gameContainer {
-  flex: 1;
-  gap: 40px;
-  padding: 20px;
-  text-align: center;
+  width: 100%;
+  height: calc(100vh - 120px);
+  gap: 15px;
+  padding: 10px 0;
+  justify-content: space-evenly;
+  overflow: hidden;
 }
 
 .player-section {
-  flex: 1;
-  justify-content: space-around;
-  padding: 20px;
-  position: relative;
+  width: 100%;
+  height: 45vh;
+  min-height: 280px;
+  padding: 10px;
+  justify-content: center;
 }
 
 /* Fondos */
-.gradient-background,
-.particle-container {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: -1;
-}
-
 .gradient-background {
-  top: 0;
-  left: 0;
+  position: fixed;
+  inset: 0;
   background: linear-gradient(45deg, #0f0c29, #302b63 50%, #24243e);
   opacity: 0.9;
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* Efectos */
@@ -79,13 +80,13 @@ body {
 
 /* Componentes */
 .progress-container {
-  width: 100%;
-  max-width: 500px;
-  height: 30px;
+  width: 95%;
+  max-width: 400px;
+  height: 25px;
   background: #eee;
   border-radius: 15px;
   overflow: hidden;
-  margin: 0 auto;
+  margin: 10px auto;
 }
 
 .progress-bar {
@@ -97,13 +98,13 @@ body {
 }
 
 .logo-base {
-  width: 250px;
-  height: 250px;
-  background: url("icon.png") center/contain;
+  width: 150px;
+  height: 150px;
+  background: url("icon.png") center/contain no-repeat;
   filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.5));
   animation: float 3s ease-in-out infinite;
   transition: transform 0.5s;
-  margin: 20px 0;
+  margin: 10px 0;
 }
 
 .game-btn {
@@ -113,11 +114,10 @@ body {
   border: 3px solid #00cc6a;
   border-radius: 10px;
   cursor: pointer;
-  margin: 20px auto;
-  display: block;
+  margin: 0 auto;
   transition: all 0.3s ease;
-  width: 100%;
-  max-width: 300px;
+  width: 90%;
+  max-width: 320px;
 }
 
 .game-btn.neon-pulse {
@@ -129,30 +129,37 @@ body {
   letter-spacing: 2px;
 }
 
-.game-btn.neon-pulse:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 25px #00ff88;
-}
-
 /* HUD */
 .hud {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  gap: 15px;
-  max-width: 500px;
-  margin: 20px auto;
-  font-size: 1.2em;
+  gap: 10px;
+  width: 95%;
+  max-width: 400px;
+  margin: 10px auto;
+  font-size: 1em;
   font-weight: bold;
   color: #fff;
   text-shadow: 1px 1px 2px #000;
-  padding: 15px;
-  width: 100%;
+  padding: 8px;
+}
+
+/* Resultados */
+.result-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  text-align: center;
+  z-index: 1000;
 }
 
 #resultMessage {
-  font-size: 3rem;
-  margin: 30px 0;
-  line-height: 1.2;
+  font-size: 2.2rem;
+  line-height: 1.1;
+  margin: 0 0 20px;
+  word-break: break-word;
   font-weight: bold;
   text-align: center;
   animation: text-glow 1.5s ease-in-out infinite alternate;
@@ -171,14 +178,10 @@ body {
 /* Utilidades */
 .hidden {
   display: none !important;
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.9);
 }
 
 .futurist-ui {
   background: rgba(0, 0, 0, 0.7);
-  padding: 15px 25px;
   border-radius: 10px;
   border: 1px solid #00ff88;
   box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
@@ -191,7 +194,7 @@ body {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-20px);
+    transform: translateY(-15px);
   }
 }
 
@@ -226,41 +229,13 @@ body {
   }
 }
 
-@keyframes player-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
-  }
-}
-
-@keyframes time-alert {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
 /* Modificadores */
-.top-player {
-  border-bottom: 2px solid rgba(0, 255, 136, 0.3);
-}
-.bottom-player {
-  border-top: 2px solid rgba(0, 255, 136, 0.3);
-}
-
 .player-1 {
   background: rgba(0, 255, 136, 0.05);
 }
 
 .player-2 {
   background: rgba(255, 0, 150, 0.05);
-  border-color: #ff0096;
 }
 
 .player-2 .progress-bar {
@@ -268,54 +243,40 @@ body {
   box-shadow: 0 0 20px rgba(255, 0, 150, 0.5);
 }
 
-span#timer1,
+#timer1,
 #timer2 {
   font-size: 1.4em;
   text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
   color: #00ff88;
 }
 
-.player-2 #timer2,
-#timer2 {
+.player-2 #timer2 {
   color: #ff0096;
   text-shadow: 0 0 10px rgba(255, 0, 150, 0.5);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .hud {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
-  .player-section .hud-item {
-    font-size: 1rem;
-  }
+/* Partículas */
+.particle-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  transform: translate(0, 0);
 }
 
-@media (max-width: 480px) {
-  .container {
-    gap: 20px;
-  }
-  #gameContainer {
-    gap: 25px;
-  }
-  .logo-base {
-    width: 200px;
-    height: 200px;
-  }
-  .game-btn {
-    font-size: 1.2em;
-    padding: 12px 25px;
-  }
-  #resultMessage {
-    font-size: 2.5rem;
-  }
+.particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  filter: brightness(1.2) contrast(1.5);
 }
 
-/* Posicionamiento de botones */
+/* Botones */
 #startBtn,
 #restartBtn {
-  position: absolute;
+  position: fixed;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
@@ -323,37 +284,37 @@ span#timer1,
 
 #startBtn {
   top: 50%;
+  transform: translate(-50%, -50%);
 }
+
 #restartBtn {
-  bottom: 20px;
+  top: 65vh;
 }
 
-.particle-container {
-  /* Cambiar de fixed a absolute */
-  position: absolute;
-  top: 0;
-  left: 0;
-  /* Añadir transformación para compensar scroll */
-  transform: translate(0, 0);
-  /* Mantener el resto de propiedades */
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1000;
+/* Responsive */
+@media (min-width: 768px) {
+  .logo-base {
+    width: 200px;
+    height: 200px;
+  }
+
+  #resultMessage {
+    font-size: 3rem;
+  }
+
+  .hud {
+    font-size: 1.2em;
+    padding: 15px;
+  }
 }
 
-.particle {
-  /* Cambiar a posición fixed */
-  position: fixed;
-  /* Resto del estilo se mantiene */
-  border-radius: 50%;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  transition: opacity 0.3s;
-}
-.particle {
-  /* Añadir transición suave para la opacidad */
-  transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  /* Efecto de profundidad con filter */
-  filter: brightness(1.2) contrast(1.5);
+@media (min-width: 1024px) {
+  .logo-base {
+    width: 250px;
+    height: 250px;
+  }
+
+  #gameContainer {
+    gap: 40px;
+  }
 }
