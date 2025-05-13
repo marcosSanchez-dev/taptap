@@ -117,7 +117,7 @@ function startGameTimer() {
 
 // Verificar condición de victoria
 function checkWinCondition(player) {
-  if (gameState.players[player].taps >= 40) {
+  if (gameState.players[player].taps >= 70) {
     gameState.active = false;
     gameState.winner = player;
     if (gameTimer) {

@@ -134,7 +134,7 @@ function handlePlayerTouch(e, player) {
 }
 // Modificar las funciones de interacción
 function registerTap(player, x, y) {
-  if (gameState.players[player].taps >= 40) return; // Usar estado del servidor
+  if (gameState.players[player].taps >= 70) return; // Usar estado del servidor
 
   ws.send(
     JSON.stringify({
@@ -142,7 +142,7 @@ function registerTap(player, x, y) {
       player: player,
       osc: {
         address: `/progress/${player}`,
-        value: (gameState.players[player].taps + 1) / 40,
+        value: (gameState.players[player].taps + 1) / 70,
       },
     })
   );
@@ -407,7 +407,7 @@ function registerTap(player, x, y) {
       player: player,
       osc: {
         address: `/progress/${player}`,
-        value: (gameState.players[player].taps + 1) / 40,
+        value: (gameState.players[player].taps + 1) / 70,
       },
     })
   );
@@ -509,7 +509,7 @@ function resetGame() {
 
 // Funciones auxiliares
 function updateProgress(player) {
-  const progress = (gameState.players[player].taps / 40) * 100;
+  const progress = (gameState.players[player].taps / 70) * 100;
   const progressBar = document.getElementById(players[player].progressBar);
   const logo = document.getElementById(players[player].logo);
   // Agregar esta línea para actualizar el contador numérico
