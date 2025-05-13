@@ -51,6 +51,10 @@ wss.on("connection", (ws) => {
     try {
       const data = JSON.parse(message);
 
+      if (data.osc) {
+        oscClient.send(data.osc.address, data.osc.value);
+      }
+
       // Manejar diferentes tipos de mensajes
       switch (data.type) {
         case "start":
@@ -71,14 +75,14 @@ wss.on("connection", (ws) => {
           resetGame();
           // Enviar comando OSC de reset
           [1, 2].forEach((player) => {
-            oscClient.send(`/win/${player}`, 0);
+            oscClient.send(`/win/${player}`, 0); // ← Dirección corregida
             oscClient.send(`/progress/${player}`, 0);
           });
           break;
       }
 
       // Enviar OSC y actualizar clientes
-      if (data.osc) oscClient.send(data.osc.address, data.osc.value);
+      // if (data.osc) oscClient.send(data.osc.address, data.osc.value);
       broadcastState();
     } catch (error) {
       console.error("[SERVER] Error:", error);
@@ -98,8 +102,11 @@ function startGameTimer() {
     if (gameState.active) {
       gameState.timeLeft--;
 
+      // En startGameTimer():
       if (gameState.timeLeft <= 0) {
         gameState.active = false;
+        // Agregar notificación OSC
+        oscClient.send("/lose", 1);
         clearInterval(gameTimer);
         gameTimer = null;
       }

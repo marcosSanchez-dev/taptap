@@ -40,7 +40,7 @@ const timerDisplay = document.getElementById("timer");
 const tapsCount = document.getElementById("tapsCount");
 const tapsTotal = document.getElementById("tapsTotal");
 const resultMessage = document.getElementById("resultMessage");
-
+let gameEndHandled = false;
 let activeTouches = new Map();
 const TAP_INTERVAL = 30; // 30ms entre taps (más rápido que el delay nativo)
 const connectionStatus = document.createElement("div");
@@ -82,6 +82,17 @@ function updateUI() {
   // Determinar estados clave
   const gameEnded =
     !!gameState.winner || (!gameState.active && gameState.timeLeft <= 0);
+
+  if (gameEnded && !gameEndHandled) {
+    if (gameState.winner) {
+      endGame(true, gameState.winner);
+    } else {
+      endGame(false, null);
+    }
+    gameEndHandled = true;
+  } else if (!gameEnded) {
+    gameEndHandled = false;
+  }
 
   // Modificar la detección de estado inicial
   const initialState =
@@ -144,7 +155,16 @@ function startGame() {
   // gameActive = true;
   // timeLeft = 10; // Resetear tiempo
   // tapsRequired = 40; // Fijar valor requerido
-  ws.send(JSON.stringify({ type: "start" }));
+  ws.send(
+    JSON.stringify({
+      type: "start",
+      osc: {
+        // <- Agregar esta propiedad
+        address: "/start",
+        value: 1,
+      },
+    })
+  );
 
   // if (timerId) clearInterval(timerId);
 
@@ -408,10 +428,37 @@ function endGame(won, player) {
   resultMessage.style.display = "block";
 
   if (won) {
-    ws.send(JSON.stringify({ address: `/win/${player}`, value: 1 }));
-    ws.send(JSON.stringify({ address: "/win", value: player }));
+    // Mensaje 1: Notificar ganador específico
+    ws.send(
+      JSON.stringify({
+        osc: {
+          // <- Nueva estructura
+          address: `/win/${player}`,
+          value: 1,
+        },
+      })
+    );
+
+    // Mensaje 2: Notificar victoria global
+    ws.send(
+      JSON.stringify({
+        osc: {
+          // <- Nueva estructura
+          address: "/win",
+          value: 1,
+        },
+      })
+    );
   } else {
-    ws.send(JSON.stringify({ address: "/lose", value: 1 }));
+    ws.send(
+      JSON.stringify({
+        osc: {
+          // <- Nueva estructura
+          address: "/lose",
+          value: 1,
+        },
+      })
+    );
   }
 
   restartBtn.classList.toggle("hidden", !gameState.winner && gameState.active);
@@ -480,20 +527,6 @@ function updateProgress(player) {
   if (progress >= 100) {
     logo.classList.add("logo-animate");
   }
-}
-
-function sendDataToMadMapper(player) {
-  const progressValue = players[player].taps / tapsRequired;
-
-  // Validar y redondear valor
-  const safeValue = Math.min(Math.max(progressValue, 0), 1).toFixed(2);
-
-  ws.send(
-    JSON.stringify({
-      address: `/progress/${player}`,
-      value: parseFloat(safeValue), // Asegurar tipo numérico
-    })
-  );
 }
 
 initTouchEvents();
