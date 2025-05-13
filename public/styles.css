@@ -1,6 +1,4 @@
-/* ================================
-   RESET Y ESTILOS BASE
-================================= */
+/* ==== RESET & ESTILOS BASE ==== */
 * {
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
@@ -20,16 +18,14 @@ body {
   background: #0a0a1a;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
   font-family: "Roboto", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  overscroll-behavior: none;
 }
 
-/* ================================
-   CONTENEDORES
-================================= */
+/* ==== CONTENEDORES ==== */
 .container,
 #gameContainer,
 .player-section {
@@ -63,14 +59,12 @@ body {
   min-height: 280px;
   padding: 10px;
   justify-content: center;
-  touch-action: manipulation;
   pointer-events: auto;
+  touch-action: manipulation;
   z-index: 100;
 }
 
-/* ================================
-   FONDOS Y EFECTOS
-================================= */
+/* ==== FONDOS & EFECTOS ==== */
 .gradient-background {
   position: fixed;
   inset: 0;
@@ -91,9 +85,7 @@ body {
   animation: hologram 2s linear infinite;
 }
 
-/* ================================
-   COMPONENTES
-================================= */
+/* ==== COMPONENTES ==== */
 .progress-container {
   width: 95%;
   max-width: 400px;
@@ -105,7 +97,7 @@ body {
 }
 
 .progress-bar {
-  width: 0%;
+  width: 0;
   height: 100%;
   background: linear-gradient(90deg, #00ff88 0%, #00ffaa 100%);
   box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
@@ -115,27 +107,27 @@ body {
 .logo-base {
   width: 150px;
   height: 150px;
+  margin: 10px 0;
+  pointer-events: none;
   background: url("icon.png") center/contain no-repeat;
   filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.5));
   animation: float 3s ease-in-out infinite;
   transition: transform 0.5s;
-  margin: 10px 0;
-  pointer-events: none;
 }
 
 .game-btn {
   padding: 15px 30px;
+  width: 90%;
+  max-width: 320px;
+  margin: 0 auto;
   font-size: 1.5em;
   background: #00ff88;
   border: 3px solid #00cc6a;
   border-radius: 10px;
   cursor: pointer;
-  margin: 0 auto;
-  transition: all 0.3s ease;
-  width: 90%;
-  max-width: 320px;
   touch-action: auto;
   pointer-events: auto !important;
+  transition: all 0.3s ease;
 }
 
 .game-btn.neon-pulse {
@@ -147,9 +139,7 @@ body {
   letter-spacing: 2px;
 }
 
-/* ================================
-   HUD
-================================= */
+/* ==== HUD ==== */
 .hud {
   display: grid;
   grid-template-columns: 1fr 2fr;
@@ -157,16 +147,13 @@ body {
   width: 95%;
   max-width: 400px;
   margin: 10px auto;
-  font-size: 1em;
-  font-weight: bold;
+  padding: 8px;
+  font: bold 1em/1 "Roboto", sans-serif;
   color: #fff;
   text-shadow: 1px 1px 2px #000;
-  padding: 8px;
 }
 
-/* ================================
-   RESULTADOS
-================================= */
+/* ==== RESULTADOS ==== */
 .result-container {
   position: fixed;
   top: 50%;
@@ -178,12 +165,9 @@ body {
 }
 
 #resultMessage {
-  font-size: 2.2rem;
-  line-height: 1.1;
   margin: 0 0 20px;
+  font: bold 2.2rem/1.1 "Roboto", sans-serif;
   word-break: break-word;
-  font-weight: bold;
-  text-align: center;
   animation: text-glow 1.5s ease-in-out infinite alternate;
 }
 
@@ -191,30 +175,26 @@ body {
   color: #00ff88;
   text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
 }
-
 .lose-message {
   color: #ff4444;
   text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
 }
 
-/* ================================
-   UTILIDADES Y MODIFICADORES
-================================= */
+/* ==== UTILIDADES & MODIFICADORES ==== */
 .hidden {
   display: none !important;
 }
 
 .futurist-ui {
   background: rgba(0, 0, 0, 0.7);
-  border-radius: 10px;
   border: 1px solid #00ff88;
+  border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
 .player-1 {
   background: rgba(0, 255, 136, 0.05);
 }
-
 .player-2 {
   background: rgba(255, 0, 150, 0.05);
 }
@@ -236,9 +216,7 @@ body {
   text-shadow: 0 0 10px rgba(255, 0, 150, 0.5);
 }
 
-/* ================================
-   BOTONES FIJOS
-================================= */
+/* ==== BOTONES FIJOS & VISIBILIDAD ==== */
 #startBtn,
 #restartBtn {
   position: fixed;
@@ -252,18 +230,24 @@ body {
   transform: translate(-50%, -50%);
 }
 
+/* restartBtn: oculto por defecto, visible si no tiene .hidden */
 #restartBtn {
   top: 65vh;
-  display: none;
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
 }
 
-#restartBtn.visible {
-  display: block;
+#restartBtn.hidden {
+  display: none !important;
 }
 
-/* ================================
-   CONEXIÓN
-================================= */
+/* ocultar startBtn cuando hay resultado */
+.result-container:not(:empty) + #startBtn {
+  display: none !important;
+}
+
+/* ==== CONEXIÓN ==== */
 .connection-status {
   position: fixed;
   top: 10px;
@@ -276,20 +260,16 @@ body {
 .connected {
   background: #00ff88;
 }
-
 .disconnected {
   background: #ff0096;
 }
 
-/* ================================
-   PARTÍCULAS
-================================= */
+/* ==== PARTÍCULAS ==== */
 .particle-container {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 1000;
-  transform: translate(0, 0);
 }
 
 .particle {
@@ -301,9 +281,7 @@ body {
   filter: brightness(1.2) contrast(1.5);
 }
 
-/* ================================
-   ANIMACIONES
-================================= */
+/* ==== ANIMACIONES ==== */
 @keyframes float {
   0%,
   100% {
@@ -313,16 +291,14 @@ body {
     transform: translateY(-15px);
   }
 }
-
 @keyframes hologram {
   0% {
     background-position: 100% 100%;
   }
   100% {
-    background-position: 0% 0%;
+    background-position: 0 0;
   }
 }
-
 @keyframes text-glow {
   from {
     text-shadow: 0 0 10px #00ff88;
@@ -331,7 +307,6 @@ body {
     text-shadow: 0 0 30px #00ff88, 0 0 10px #fff;
   }
 }
-
 @keyframes tap-pulse {
   0%,
   100% {
@@ -345,19 +320,15 @@ body {
   }
 }
 
-/* ================================
-   RESPONSIVE
-================================= */
+/* ==== RESPONSIVE ==== */
 @media (min-width: 768px) {
   .logo-base {
     width: 200px;
     height: 200px;
   }
-
   #resultMessage {
     font-size: 3rem;
   }
-
   .hud {
     font-size: 1.2em;
     padding: 15px;
@@ -369,34 +340,12 @@ body {
     width: 250px;
     height: 250px;
   }
-
   #gameContainer {
     gap: 40px;
   }
 }
 
-/* Asegurar que el botón de reinicio mantenga su visibilidad */
-#restartBtn:not(.hidden) {
-  display: block !important;
-}
-
-/* Ocultar startBtn cuando hay mensajes activos */
-.result-container:not(:empty) + #startBtn {
-  display: none !important;
-}
-
-/* Asegurar que el botón de reinicio se vea solo cuando corresponde */
-#restartBtn:not(.hidden) {
-  display: block !important;
-  opacity: 1 !important;
-  pointer-events: all !important;
-}
-
-/* Ocultar cuando hay estado inicial */
-#restartBtn.hidden {
-  display: none !important;
-}
-
+/* ==== LOGO2 DROP-SHADOW ==== */
 #logo2 {
   filter: drop-shadow(0 0 15px rgba(255, 0, 149, 0.42));
 }
