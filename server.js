@@ -26,15 +26,11 @@ function broadcastState() {
   });
 }
 
-// Función para reiniciar el juego
 function resetGame() {
   gameState = {
     active: false,
-    timeLeft: 10,
-    players: {
-      1: { taps: 0 },
-      2: { taps: 0 },
-    },
+    timeLeft: 10, // Restablecer a valor inicial
+    players: { 1: { taps: 0 }, 2: { taps: 0 } },
     winner: null,
   };
   broadcastState();
@@ -63,8 +59,14 @@ wss.on("connection", (ws) => {
           }
           break;
 
+        // En el switch(message.type):
         case "reset":
           resetGame();
+          // Enviar comando OSC de reset
+          [1, 2].forEach((player) => {
+            oscClient.send(`/win/${player}`, 0);
+            oscClient.send(`/progress/${player}`, 0);
+          });
           break;
       }
 

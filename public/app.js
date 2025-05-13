@@ -79,24 +79,30 @@ function updateUI() {
   updateProgress(1);
   updateProgress(2);
 
-  // Manejar visibilidad de elementos
-  restartBtn.classList.toggle(
-    "visible",
-    !!gameState.winner || (!gameState.active && gameState.timeLeft <= 0)
-  );
-  gameContainer.classList.toggle("hidden", !gameState.active);
-  startBtn.classList.toggle("hidden", gameState.active);
-  resultMessage.style.display = gameState.winner ? "block" : "none";
+  // Determinar estados clave
+  const gameEnded =
+    !!gameState.winner || (!gameState.active && gameState.timeLeft <= 0);
 
-  // Mostrar mensaje de resultado
+  // Modificar la detección de estado inicial
+  const initialState =
+    !gameState.active &&
+    gameState.timeLeft === 10 &&
+    gameState.players[1].taps === 0 &&
+    gameState.players[2].taps === 0;
+
+  // Manejar visibilidad de elementos
+  startBtn.classList.toggle("hidden", !initialState);
+  restartBtn.classList.toggle("hidden", !gameEnded);
+  gameContainer.classList.toggle("hidden", !gameState.active);
+  resultMessage.style.display = gameEnded ? "block" : "none";
+
+  // Configurar mensajes
   if (gameState.winner) {
     resultMessage.textContent = `PLAYER ${gameState.winner} WINS! 🎉`;
     resultMessage.className = "win-message";
-    restartBtn.classList.remove("hidden");
-  } else if (!gameState.active && gameState.timeLeft <= 0) {
+  } else if (gameEnded) {
     resultMessage.textContent = "TIME'S UP! ⏳";
     resultMessage.className = "lose-message";
-    restartBtn.classList.remove("hidden");
   }
 }
 
@@ -414,7 +420,8 @@ function endGame(won, player) {
 
 function resetGame() {
   ws.send(JSON.stringify({ type: "reset" }));
-  restartBtn.classList.remove("visible");
+  // restartBtn.classList.remove("hidden");
+  // startBtn.classList.add("hidden");
   // Detener timer inmediatamente
   if (timerId) {
     clearInterval(timerId);

@@ -374,3 +374,29 @@ body {
     gap: 40px;
   }
 }
+
+/* Asegurar que el botón de reinicio mantenga su visibilidad */
+#restartBtn:not(.hidden) {
+  display: block !important;
+}
+
+/* Ocultar startBtn cuando hay mensajes activos */
+.result-container:not(:empty) + #startBtn {
+  display: none !important;
+}
+
+/* Asegurar que el botón de reinicio se vea solo cuando corresponde */
+#restartBtn:not(.hidden) {
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+}
+
+/* Ocultar cuando hay estado inicial */
+#restartBtn.hidden {
+  display: none !important;
+}
+
+#logo2 {
+  filter: drop-shadow(0 0 15px rgba(255, 0, 149, 0.42));
+}
