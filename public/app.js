@@ -39,6 +39,8 @@ const players = {
     logo: "logo2",
   },
 };
+let activeTouches = new Map();
+const TAP_INTERVAL = 30; // 30ms entre taps (más rápido que el delay nativo)
 
 // Estado inicial
 startBtn.classList.remove("hidden");
@@ -49,7 +51,11 @@ resultMessage.textContent = "";
 // Event Listeners
 startBtn.addEventListener("click", startGame);
 restartBtn.addEventListener("click", resetGame);
-document.body.addEventListener("pointerdown", handleTap);
+document.body.addEventListener("touchstart", handleTouchStart, {
+  passive: false,
+});
+document.body.addEventListener("touchend", handleTouchEnd);
+document.body.addEventListener("touchcancel", handleTouchEnd);
 
 // Añade esta función en tu app.js
 function updateUI() {
@@ -183,6 +189,26 @@ function animateLogo(player) {
   });
 }
 
+function initTouchEvents() {
+  document.body.addEventListener("touchstart", handleTouchStart, {
+    passive: true,
+  });
+  document.body.addEventListener("touchend", handleTouchEnd, { passive: true });
+  document.body.addEventListener("touchcancel", handleTouchEnd, {
+    passive: true,
+  });
+
+  // Habilitar clicks en botones
+  document.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener(
+      "touchstart",
+      (e) => {
+        e.stopPropagation();
+      },
+      { passive: true }
+    );
+  });
+}
 function handleTap(e) {
   e.preventDefault();
   const now = Date.now();
@@ -211,7 +237,94 @@ function handleTap(e) {
 
   createParticles(e.pageX, e.pageY, player);
   animateLogo(player);
-  vibrate(50);
+  // vibrate(50);
+}
+
+function handleTouchStart(e) {
+  if (gameActive && e.target.closest("#gameContainer")) {
+    e.preventDefault();
+  }
+  if (!gameActive) return;
+
+  const now = performance.now(); // Mayor precisión
+
+  Array.from(e.changedTouches).forEach((touch) => {
+    const touchData = {
+      id: touch.identifier,
+      lastTap: now,
+      pos: { x: touch.pageX, y: touch.pageY },
+      cooldown: false,
+    };
+
+    activeTouches.set(touch.identifier, touchData);
+    processTap(touchData);
+  });
+}
+
+function handleTouch(e) {
+  e.preventDefault();
+  const now = Date.now();
+
+  // Procesar todos los toques
+  Array.from(e.changedTouches).forEach((touch) => {
+    if (!gameActive || timeLeft <= 0 || document.hidden) return;
+
+    // Validación por dedo individual
+    if (!activeTouches[touch.identifier]) {
+      activeTouches[touch.identifier] = {
+        lastTap: now,
+        pos: { x: touch.pageX, y: touch.pageY },
+      };
+
+      processTap(touch.pageX, touch.pageY);
+    }
+  });
+}
+
+function handleTouchEnd(e) {
+  Array.from(e.changedTouches).forEach((touch) => {
+    activeTouches.delete(touch.identifier);
+  });
+}
+
+function processTap(touchData) {
+  const now = performance.now();
+  const player = touchData.pos.y < window.innerHeight / 2 ? 1 : 2;
+
+  // Verificación ultra-rápida con requestAnimationFrame
+  requestAnimationFrame(() => {
+    if (!activeTouches.has(touchData.id)) return;
+
+    if (now - touchData.lastTap >= TAP_INTERVAL) {
+      touchData.lastTap = now;
+      registerTap(player, touchData.pos.x, touchData.pos.y);
+    } else if (!touchData.cooldown) {
+      touchData.cooldown = true;
+      setTimeout(() => {
+        if (activeTouches.has(touchData.id)) {
+          touchData.cooldown = false;
+          processTap(touchData);
+        }
+      }, TAP_INTERVAL);
+    }
+  });
+}
+
+function registerTap(player, x, y) {
+  if (players[player].taps >= tapsRequired) return;
+
+  players[player].taps++;
+  updateProgress(player);
+  sendDataToMadMapper(player);
+
+  // Efectos
+  createParticles(x, y, player);
+  animateLogo(player);
+  // vibrate(10);
+
+  if (players[player].taps === tapsRequired) {
+    endGame(true, player);
+  }
 }
 
 function endGame(won, player) {
@@ -288,7 +401,7 @@ function updateProgress(player) {
   }
 
   progressBar.style.width = `${progress}%`;
-  logo.style.transform = `scale(${1 + progress / 100})`;
+  // logo.style.transform = `scale(${1 + progress / 100})`;
   countElement.textContent = players[player].taps; // <- Esta es la línea clave
 
   if (progress >= 100) {
@@ -309,6 +422,8 @@ function sendDataToMadMapper(player) {
     })
   );
 }
+
+initTouchEvents();
 // WebSocket handlers
 ws.onopen = () => console.log("WS: Conectado");
 ws.onerror = (error) => console.error("WS Error:", error);

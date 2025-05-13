@@ -1,4 +1,10 @@
 /* Reset y estilos base */
+* {
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 html,
 body {
   height: 100%;
@@ -8,7 +14,7 @@ body {
 }
 
 body {
-  touch-action: manipulation;
+  /* touch-action: manipulation; */
   -webkit-touch-callout: none;
   user-select: none;
   background: #0a0a1a;
@@ -18,6 +24,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  overscroll-behavior: none;
 }
 
 /* Contenedores */
@@ -55,6 +64,7 @@ body {
   min-height: 280px;
   padding: 10px;
   justify-content: center;
+  touch-action: none;
 }
 
 /* Fondos */
@@ -106,6 +116,7 @@ body {
   animation: float 3s ease-in-out infinite;
   transition: transform 0.5s;
   margin: 10px 0;
+  touch-action: manipulation;
 }
 
 .game-btn {
@@ -119,6 +130,8 @@ body {
   transition: all 0.3s ease;
   width: 90%;
   max-width: 320px;
+  touch-action: auto;
+  pointer-events: auto !important;
 }
 
 .game-btn.neon-pulse {
@@ -318,4 +331,9 @@ body {
   #gameContainer {
     gap: 40px;
   }
+}
+
+#startBtn,
+#restartBtn {
+  z-index: 1001; /* Mayor que el particle-container */
 }
