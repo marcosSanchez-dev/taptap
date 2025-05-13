@@ -10,12 +10,27 @@ const ws = new WebSocket("ws://" + serverIP + ":8080");
 // const ws = new WebSocket(`${wsProtocol}${wsHost}`);
 
 // Variables globales
-let gameActive = false;
-let timeLeft = 10;
-let tapsRequired = 40;
-let currentTaps = 0;
-let timerId = null;
-let lastTap = 0;
+// Eliminar estas variables duplicadas
+// let gameActive = false;
+// let timeLeft = 10;
+// let tapsRequired = 40;
+// let currentTaps = 0;
+// let timerId = null;
+
+let timerId = null; // Agregar esta línea
+
+const players = {
+  1: {
+    progressBar: "progress-bar1",
+    countElement: "tapsCount1",
+    logo: "logo1",
+  },
+  2: {
+    progressBar: "progress-bar2",
+    countElement: "tapsCount2",
+    logo: "logo2",
+  },
+};
 
 // Elementos del DOM
 const startBtn = document.getElementById("startBtn");
@@ -25,22 +40,12 @@ const timerDisplay = document.getElementById("timer");
 const tapsCount = document.getElementById("tapsCount");
 const tapsTotal = document.getElementById("tapsTotal");
 const resultMessage = document.getElementById("resultMessage");
-const players = {
-  1: {
-    taps: 0,
-    progressBar: "progress-bar1",
-    countElement: "tapsCount1",
-    logo: "logo1",
-  },
-  2: {
-    taps: 0,
-    progressBar: "progress-bar2",
-    countElement: "tapsCount2",
-    logo: "logo2",
-  },
-};
+let gameEndHandled = false;
 let activeTouches = new Map();
 const TAP_INTERVAL = 30; // 30ms entre taps (más rápido que el delay nativo)
+const connectionStatus = document.createElement("div");
+connectionStatus.className = "connection-status";
+document.body.appendChild(connectionStatus);
 
 // Estado inicial
 startBtn.classList.remove("hidden");
@@ -51,37 +56,117 @@ resultMessage.textContent = "";
 // Event Listeners
 startBtn.addEventListener("click", startGame);
 restartBtn.addEventListener("click", resetGame);
-document.body.addEventListener("touchstart", handleTouchStart, {
-  passive: false,
-});
-document.body.addEventListener("touchend", handleTouchEnd);
-document.body.addEventListener("touchcancel", handleTouchEnd);
+document
+  .querySelector(".player-1")
+  .addEventListener("touchstart", (e) => handlePlayerTouch(e, 1));
+document
+  .querySelector(".player-2")
+  .addEventListener("touchstart", (e) => handlePlayerTouch(e, 2));
+// document.body.addEventListener("touchend", handleTouchEnd);
+// document.body.addEventListener("touchcancel", handleTouchEnd);
 
 // Añade esta función en tu app.js
 function updateUI() {
-  [1, 2].forEach((player) => {
-    const progressBar = document.getElementById(`progress-bar${player}`);
-    const tapsCount = document.getElementById(`tapsCount${player}`);
-    const logo = document.getElementById(`logo${player}`);
+  // Actualizar contadores
+  document.getElementById("tapsCount1").textContent = gameState.players[1].taps;
+  document.getElementById("tapsCount2").textContent = gameState.players[2].taps;
 
-    if (progressBar) progressBar.style.width = "0%";
-    if (tapsCount) tapsCount.textContent = "0";
-    if (logo) {
-      logo.style.transform = "scale(1)";
-      logo.classList.remove("logo-animate");
+  // Actualizar timers
+  document.getElementById("timer1").textContent = gameState.timeLeft;
+  document.getElementById("timer2").textContent = gameState.timeLeft;
+
+  // Actualizar progress bars
+  updateProgress(1);
+  updateProgress(2);
+
+  // Determinar estados clave
+  const gameEnded =
+    !!gameState.winner || (!gameState.active && gameState.timeLeft <= 0);
+
+  if (gameEnded && !gameEndHandled) {
+    if (gameState.winner) {
+      endGame(true, gameState.winner);
+    } else {
+      endGame(false, null);
     }
-  });
+    gameEndHandled = true;
+  } else if (!gameEnded) {
+    gameEndHandled = false;
+  }
 
-  const timerElement = document.getElementById("timer");
-  if (timerElement) timerElement.textContent = timeLeft;
+  // Modificar la detección de estado inicial
+  const initialState =
+    !gameState.active &&
+    gameState.timeLeft === 10 &&
+    gameState.players[1].taps === 0 &&
+    gameState.players[2].taps === 0;
+
+  // Manejar visibilidad de elementos
+  startBtn.classList.toggle("hidden", !initialState);
+  restartBtn.classList.toggle("hidden", !gameEnded);
+  gameContainer.classList.toggle("hidden", !gameState.active);
+  resultMessage.style.display = gameEnded ? "block" : "none";
+
+  // Configurar mensajes
+  if (gameState.winner) {
+    resultMessage.textContent = `PLAYER ${gameState.winner} WINS! 🎉`;
+    resultMessage.className = "win-message";
+  } else if (gameEnded) {
+    resultMessage.textContent = "TIME'S UP! ⏳";
+    resultMessage.className = "lose-message";
+  }
+}
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  if (data.type === "state") {
+    gameState = data;
+    updateUI();
+  }
+};
+
+function handlePlayerTouch(e, player) {
+  if (!gameState.active || gameState.winner) return;
+
+  e.preventDefault();
+  const touch = e.changedTouches[0];
+  registerTap(player, touch.pageX, touch.pageY);
+}
+// Modificar las funciones de interacción
+function registerTap(player, x, y) {
+  if (gameState.players[player].taps >= 70) return; // Usar estado del servidor
+
+  ws.send(
+    JSON.stringify({
+      type: "tap",
+      player: player,
+      osc: {
+        address: `/progress/${player}`,
+        value: (gameState.players[player].taps + 1) / 70,
+      },
+    })
+  );
+
+  createParticles(x, y, player);
+  animateLogo(player);
 }
 
 function startGame() {
-  gameActive = true;
-  timeLeft = 10; // Resetear tiempo
-  tapsRequired = 40; // Fijar valor requerido
+  // gameActive = true;
+  // timeLeft = 10; // Resetear tiempo
+  // tapsRequired = 40; // Fijar valor requerido
+  ws.send(
+    JSON.stringify({
+      type: "start",
+      osc: {
+        // <- Agregar esta propiedad
+        address: "/start",
+        value: 1,
+      },
+    })
+  );
 
-  if (timerId) clearInterval(timerId);
+  // if (timerId) clearInterval(timerId);
 
   // Resetear ambos jugadores
   Object.keys(players).forEach((p) => {
@@ -90,28 +175,27 @@ function startGame() {
 
   // Configurar UI inicial
   startBtn.classList.add("hidden");
-  restartBtn.classList.add("hidden");
   gameContainer.classList.remove("hidden");
   resultMessage.style.display = "none";
 
   ws.send(JSON.stringify({ address: "/start", value: 1 }));
 
   // Resetear valores
-  timeLeft = 10;
-  currentTaps = 0;
+  // timeLeft = 10;
+  // currentTaps = 0;
   updateUI();
 
   // Temporizador
-  timerId = setInterval(() => {
-    if (timeLeft > 0) {
-      timeLeft--;
-      document.getElementById("timer1").textContent = timeLeft;
-      document.getElementById("timer2").textContent = timeLeft;
-    } else {
-      endGame(false);
-      clearInterval(timerId);
-    }
-  }, 1000);
+  // timerId = setInterval(() => {
+  //   if (timeLeft > 0) {
+  //     timeLeft--;
+  //     document.getElementById("timer1").textContent = timeLeft;
+  //     document.getElementById("timer2").textContent = timeLeft;
+  //   } else {
+  //     endGame(false);
+  //     clearInterval(timerId);
+  //   }
+  // }, 1000);
 }
 
 function createParticles(x, y, player) {
@@ -119,6 +203,12 @@ function createParticles(x, y, player) {
     player === 1
       ? { primary: "#00ff88", shadow: "0, 255, 136" }
       : { primary: "#ff0096", shadow: "255, 0, 150" };
+
+  const now = Date.now();
+  if (gameState.serverTime) {
+    const latency = Date.now() - gameState.serverTime;
+    x = x + latency * 0.05; // Ajuste predictivo básico
+  }
 
   for (let i = 0; i < 10; i++) {
     const particle = document.createElement("div");
@@ -311,20 +401,20 @@ function processTap(touchData) {
 }
 
 function registerTap(player, x, y) {
-  if (players[player].taps >= tapsRequired) return;
+  ws.send(
+    JSON.stringify({
+      type: "tap",
+      player: player,
+      osc: {
+        address: `/progress/${player}`,
+        value: (gameState.players[player].taps + 1) / 70,
+      },
+    })
+  );
 
-  players[player].taps++;
-  updateProgress(player);
-  sendDataToMadMapper(player);
-
-  // Efectos
+  // Mantener solo efectos visuales locales
   createParticles(x, y, player);
   animateLogo(player);
-  // vibrate(10);
-
-  if (players[player].taps === tapsRequired) {
-    endGame(true, player);
-  }
 }
 
 function endGame(won, player) {
@@ -338,17 +428,47 @@ function endGame(won, player) {
   resultMessage.style.display = "block";
 
   if (won) {
-    ws.send(JSON.stringify({ address: `/win/${player}`, value: 1 }));
-    ws.send(JSON.stringify({ address: "/win", value: player }));
+    // Mensaje 1: Notificar ganador específico
+    ws.send(
+      JSON.stringify({
+        osc: {
+          // <- Nueva estructura
+          address: `/win/${player}`,
+          value: 1,
+        },
+      })
+    );
+
+    // Mensaje 2: Notificar victoria global
+    ws.send(
+      JSON.stringify({
+        osc: {
+          // <- Nueva estructura
+          address: "/win",
+          value: 1,
+        },
+      })
+    );
   } else {
-    ws.send(JSON.stringify({ address: "/lose", value: 1 }));
+    ws.send(
+      JSON.stringify({
+        osc: {
+          // <- Nueva estructura
+          address: "/lose",
+          value: 1,
+        },
+      })
+    );
   }
 
-  restartBtn.classList.remove("hidden");
-  gameContainer.classList.add("hidden");
+  restartBtn.classList.toggle("hidden", !gameState.winner && gameState.active);
+  gameContainer.classList.toggle("hidden", !gameState.active);
 }
 
 function resetGame() {
+  ws.send(JSON.stringify({ type: "reset" }));
+  // restartBtn.classList.remove("hidden");
+  // startBtn.classList.add("hidden");
   // Detener timer inmediatamente
   if (timerId) {
     clearInterval(timerId);
@@ -389,7 +509,7 @@ function resetGame() {
 
 // Funciones auxiliares
 function updateProgress(player) {
-  const progress = (players[player].taps / tapsRequired) * 100;
+  const progress = (gameState.players[player].taps / 70) * 100;
   const progressBar = document.getElementById(players[player].progressBar);
   const logo = document.getElementById(players[player].logo);
   // Agregar esta línea para actualizar el contador numérico
@@ -402,28 +522,21 @@ function updateProgress(player) {
 
   progressBar.style.width = `${progress}%`;
   // logo.style.transform = `scale(${1 + progress / 100})`;
-  countElement.textContent = players[player].taps; // <- Esta es la línea clave
+  countElement.textContent = gameState.players[player].taps; // <- Esta es la línea clave
 
   if (progress >= 100) {
     logo.classList.add("logo-animate");
   }
 }
 
-function sendDataToMadMapper(player) {
-  const progressValue = players[player].taps / tapsRequired;
-
-  // Validar y redondear valor
-  const safeValue = Math.min(Math.max(progressValue, 0), 1).toFixed(2);
-
-  ws.send(
-    JSON.stringify({
-      address: `/progress/${player}`,
-      value: parseFloat(safeValue), // Asegurar tipo numérico
-    })
-  );
-}
-
 initTouchEvents();
 // WebSocket handlers
-ws.onopen = () => console.log("WS: Conectado");
+ws.onopen = () => {
+  console.log("WS: Conectado");
+  connectionStatus.className = "connection-status connected";
+};
+
+ws.onclose = () => {
+  connectionStatus.className = "connection-status disconnected";
+};
 ws.onerror = (error) => console.error("WS Error:", error);
