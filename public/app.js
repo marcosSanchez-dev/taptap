@@ -161,8 +161,8 @@ function startGame() {
   ws.send(JSON.stringify({ address: "/start", value: 1 }));
 
   // Resetear valores
-  timeLeft = 10;
-  currentTaps = 0;
+  // timeLeft = 10;
+  // currentTaps = 0;
   updateUI();
 
   // Temporizador

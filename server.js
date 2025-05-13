@@ -16,6 +16,8 @@ let gameState = {
   },
   winner: null,
 };
+// Agregar al inicio del server.js
+let gameTimer = null;
 
 // Función para broadcast a todos los clientes
 function broadcastState() {
@@ -27,9 +29,14 @@ function broadcastState() {
 }
 
 function resetGame() {
+  if (gameTimer) {
+    clearInterval(gameTimer);
+    gameTimer = null;
+  }
+
   gameState = {
     active: false,
-    timeLeft: 10, // Restablecer a valor inicial
+    timeLeft: 10,
     players: { 1: { taps: 0 }, 2: { taps: 0 } },
     winner: null,
   };
@@ -81,13 +88,20 @@ wss.on("connection", (ws) => {
 
 // Temporizador del juego
 function startGameTimer() {
-  const timer = setInterval(() => {
+  // Limpiar timer existente
+  if (gameTimer) {
+    clearInterval(gameTimer);
+    gameTimer = null;
+  }
+
+  gameTimer = setInterval(() => {
     if (gameState.active) {
       gameState.timeLeft--;
 
       if (gameState.timeLeft <= 0) {
         gameState.active = false;
-        clearInterval(timer);
+        clearInterval(gameTimer);
+        gameTimer = null;
       }
       broadcastState();
     }
@@ -99,6 +113,10 @@ function checkWinCondition(player) {
   if (gameState.players[player].taps >= 40) {
     gameState.active = false;
     gameState.winner = player;
+    if (gameTimer) {
+      clearInterval(gameTimer);
+      gameTimer = null;
+    }
     broadcastState();
   }
 }
